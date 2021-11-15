@@ -12,7 +12,7 @@ module.exports = {
                 if(err){
                     return res.json({
                         success : 0,
-                        message: "Invalid token "
+                        message: "Invalid token"
                     });
                 }
                 else{ 
