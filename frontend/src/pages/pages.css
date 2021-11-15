@@ -1,0 +1,36 @@
+.maincard.card{
+    margin-left: 40%;
+    margin-top:30vh;
+}
+.card-body{
+    background-color: #fce4a1;
+    /* border: 3px solid red; */
+}
+.mb-2.text-muted.card-subtitle.h6 {
+    margin-top: 30px;
+    /* margin-bottom: -10px; */
+}
+h1{
+    color: white;
+}
+h3{
+    color: white;
+}
+a.link-rector {
+    margin: 10px;
+    font-size: larger;
+}
+a.link-student {
+    
+    font-size: larger;
+}
+.backimg{
+    background-image: url(https://i.pinimg.com/originals/36/47/7f/36477f49c9b1f0aabd3b78ca0da2e46a.png);
+  position: fixed;
+  min-width: 100%;
+  min-height: 100%;
+  background-size: cover;
+  background-position: center;
+  text-align: center;
+  /* opacity: 0.8; */
+}
