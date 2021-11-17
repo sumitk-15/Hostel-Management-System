@@ -2,7 +2,7 @@ const {verify} = require("jsonwebtoken");
 const { }=require("express-validator");
 
 
-module.exports = {
+module.exports = { 
     checkToken : (req,res,next) => {
         let token = req.headers['x-access-token'] || req.headers['authorization']; 
        // let token = req.headers("authorization");

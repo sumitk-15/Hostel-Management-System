@@ -119,6 +119,12 @@ module.exports= {
         );
 
 
+    },
+    application:(data,callBack) => {
+        pool.query(
+            
+
+        );
     }
 
 };
