@@ -648,7 +648,7 @@ module.exports = {
 
         var mailOptions = {
             from: 'hostel@gmail.com',
-            to: 'xyz@gmail.com',
+            to: 'xyzw@gmail.com',
             subject: 'Sending Mail to receive otp',
             text: 'Thank you...please change password'
         };
