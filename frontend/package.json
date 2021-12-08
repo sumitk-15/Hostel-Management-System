@@ -2,19 +2,23 @@
   "name": "demo",
   "version": "0.1.0",
   "private": true,
-  "proxy" : "http://localhost:3001",
+  "proxy": "http://localhost:3001/",
   "dependencies": {
     "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^11.2.7",
     "@testing-library/user-event": "^12.8.3",
     "axios": "^0.22.0",
     "bootstrap": "^5.1.1",
+    "formik": "^2.2.9",
     "react": "^17.0.2",
     "react-bootstrap": "^2.0.0-rc.0",
     "react-dom": "^17.0.2",
     "react-icons": "^4.3.1",
+    "react-password-strength-bar": "^0.4.0",
     "react-scripts": "4.0.3",
-    "web-vitals": "^1.1.2"
+    "universal-cookie": "^4.0.4",
+    "web-vitals": "^1.1.2",
+    "yup": "^0.32.11"
   },
   "scripts": {
     "start": "react-scripts start",

@@ -6,16 +6,19 @@ import "./LoginPage.css";
 import '../../node_modules/bootstrap/dist/css/bootstrap.min.css';
 import { Card } from 'react-bootstrap';
 import Button from "@restart/ui/esm/Button";
+import Dashboards from "./Dashboards";
 
 
 // import "./Temp.css";
 // class Temp extends Component
 
 function Student() {
-   
+  
     return (
         <>
-      <Router>
+        {/* basename="/react-auth-ui/" */}
+        <Router>
+   
         <div className="Temp">
         <div className="header">
          <h2 className="title">Hostel Allocation and Management System</h2>
@@ -73,11 +76,14 @@ function Student() {
 
             <Route exact path="/" component={StudentSignUp} />
             <Route path="/sign-in" component={StudentSignIn} />
+            {/* <Route path="/Dashboard" component={Dashboards} /> */}
+           
           </div>
           <div className="footer"><h5 className="footer-text">A Portal for Hostel Room Allocation and Management | Copyright@2021</h5></div>
+     
         </div>
-      </Router>
-      
+       
+        </Router>
       </>
     );
   

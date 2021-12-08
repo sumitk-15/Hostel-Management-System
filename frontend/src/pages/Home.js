@@ -21,8 +21,8 @@ function Home(){
             <Card.Text>
               
             </Card.Text>
-            <NavLink className="link-rector" to="/Dashboard/home"> Rector</NavLink>
-            <NavLink className="link-student" to="/Student"> Student</NavLink>
+            <NavLink className="link-rector" to="/rector"> Rector</NavLink>
+            <NavLink className="link-student" to="/student"> Student</NavLink>
           
           </Card.Body>
       </Card>

@@ -120,7 +120,7 @@ a.pageSwitcherItem.pageSwitcherItem-active{
       display: block;
       text-transform: uppercase;
       font-size: 0.9em;
-      color: white;
+      color: rgb(0, 0, 0);
     }
     .formFieldInput {
       width: 85%;
@@ -239,7 +239,7 @@ a.pageSwitcherItem.pageSwitcherItem-active{
   padding: 15px 70px;
   font-size: 0.8em;
   font-weight: 500;
-  width: 210px;
+  width: 240px;
   margin-left: 140px;
   margin-top: 20px;
   background: linear-gradient( 

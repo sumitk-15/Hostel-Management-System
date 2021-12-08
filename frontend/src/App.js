@@ -5,7 +5,7 @@ import Rector from "./pages/Rector";
 import Student from "./pages/Student";
 import Home from './pages/Home';
 import Dashboards from './pages/Dashboards';
-
+import RectorDash from './pages/RectorDash';
 
 
 
@@ -25,8 +25,10 @@ function App() {
       <div className="App">
         <Switch>
           <Route path="/" exact component={Home}></Route>
-          <Route path="/Student"  component={Student}></Route>
-          <Route path="/Dashboard"  component={Dashboards}></Route>
+          <Route path="/student"  component={Student}></Route>
+          <Route path="/rector"  component={Rector}></Route>
+          <Route path="/Dashboard" component={Dashboards} />
+          <Route path="/Dash" component={RectorDash} />
 
         </Switch>
       </div>

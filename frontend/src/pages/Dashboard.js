@@ -10,6 +10,7 @@ import FormControl from 'react-bootstrap/FormControl'
 import './Dashboard.css';
 
  function Dashboard() {
+
     return (
         <div>
             <Navbar bg="light" expand="lg">
@@ -21,7 +22,7 @@ import './Dashboard.css';
       style={{ maxHeight: '100px' }}
       navbarScroll
     >
-      <Nav.Link href="#action1">Home</Nav.Link>
+      <Nav.Link to="Dashboard/home">Home</Nav.Link>
       <Nav.Link href="#action2">About</Nav.Link>
       {/* <NavDropdown title="Link" id="navbarScrollingDropdown">
         <NavDropdown.Item href="#action3">Action</NavDropdown.Item>
@@ -29,9 +30,7 @@ import './Dashboard.css';
         <NavDropdown.Divider />
         <NavDropdown.Item href="#action5">Something else here</NavDropdown.Item>
       </NavDropdown> */}
-      <Nav.Link href="#">
-        Profile
-      </Nav.Link>
+    
     </Nav>
     <Form className="d-flex">
       <FormControl
@@ -41,6 +40,7 @@ import './Dashboard.css';
         aria-label="Search"
       />
       <Button variant="outline-success">Search</Button>
+      <Button variant="outline-success">Logout</Button>
     </Form>
   </Navbar.Collapse>
 </Navbar>

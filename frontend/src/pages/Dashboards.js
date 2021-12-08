@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect} from 'react';
 import * as FaIcons from 'react-icons/fa';
 import * as AiIcons from 'react-icons/ai';
 import * as IoIcons from 'react-icons/io';
@@ -9,16 +9,20 @@ import { IconContext } from 'react-icons';
 import Form from 'react-bootstrap/Form'
 import FormControl from 'react-bootstrap/FormControl'
 import Button from "@restart/ui/esm/Button";
-import { HashRouter as Router, Route, NavLink } from "react-router-dom";
+import { HashRouter as Router, Route,NavLink } from "react-router-dom";
 
 import NavHome from './Nav/NavHome';
 import Apply from './Nav/Apply';
 import Profile from './Nav/Profile';
 import Allotment from './Nav/Allotment';
-import Notificatons from './Nav/Notificatons';
+import Rooms from './Nav/Rooms';
 import Message from './Nav/Message';
-import Settings from './Nav/Settings';
+import About from './Nav/About';
+import Contact from './Nav/contactus';
+import Payment from './Nav/Payment';
 
+
+// window.location.reload();
 
 function Dashboards() {
   const [sidebar, setSidebar] = useState(false);
@@ -26,6 +30,7 @@ function Dashboards() {
   const showSidebar = () => setSidebar(!sidebar);
 
   return (
+    
     <>
       <IconContext.Provider value={{ color: '#fff' }}>
         <div className='navbar'>
@@ -33,16 +38,10 @@ function Dashboards() {
           <Link to='#' className='menu-bars'>
             <FaIcons.FaBars onClick={showSidebar} />
           </Link>
+          <NavLink className="nav-link" to="/Dashboard/home">Home</NavLink>
+          <NavLink className="nav-link" to="/Dashboard/about">About</NavLink>
+          <NavLink className="nav-link" to="/Dashboard/contacts">Contact US</NavLink>
 
-          <Link to='#action1' className='nav-item'>
-            Home
-          </Link>
-          <Link to='#' className='nav-item'>
-            About
-          </Link>
-          <Link to='#' className='nav-item'>
-            Contact Us
-          </Link>
           <Form className="d-flex">
             <FormControl
               type="search"
@@ -51,6 +50,7 @@ function Dashboards() {
               aria-label="Search"
             />
             <Button variant="outline-success">Search</Button>
+            <Button style={{marginLeft:'20px'}} variant="contained">Logout</Button>
           </Form>
 
         </div>
@@ -77,12 +77,15 @@ function Dashboards() {
        
        
         <Route path="/Dashboard/home" component={NavHome} />
-        <Route path='/profile' component={Profile} />
+        <Route path='/Dashboard/profile' component={Profile} />
         <Route path='/Dashboard/apply' component={Apply} />
         <Route path='/Dashboard/allotment' component={Allotment} />
-        <Route path='/Dashboard/notifications' component={Notificatons} />
+        <Route path='/Dashboard/rooms' component={Rooms} />
         <Route path='/Dashboard/message' component={Message} />
-        <Route path='/Dashboard/settings' component={Settings} />
+        <Route path='/Dashboard/about' component={About} />
+        <Route path='/Dashboard/contacts' component={Contact} />
+        <Route path='/Dashboard/payment' component={Payment} />
+       
 
 
       </IconContext.Provider>

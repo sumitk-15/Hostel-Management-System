@@ -3,25 +3,22 @@ import { Link } from "react-router-dom";
 import axios from 'axios';
 import { Redirect } from 'react-router';
 import Dashboard from "./Dashboard";
-import {BrowserRouter as Router, Route, Switch, NavLink } from 'react-router-dom';
+import {BrowserRouter as Router, Route} from 'react-router-dom';
 import { useHistory } from "react-router-dom";
+import auth from "../auth";
+import NavHome from "./Nav/NavHome";
+// import Cookies from 'universal-cookie';
+ 
+// const cookies = new Cookies();
+// axios.defaults.withCredentials = true;
+
+
 
 function StudentSignIn(){
 
-  // const [Email, setEmail] = useState("");
-  // const [Pass, setPass] = useState("");
-  // const Login = () =>{
-  //   Axios.post('http://localhost:3001/login',{
-  //       email: Email,
-  //       pass: Pass,
-  //   }).then((response) => {
-  //       console.log(response)
-  //       alert("Logged in successfully")
-  //   }).catch(error => {
-  //     console.error(error)
-  //   })
-   
-  // };
+
+  <Route path='/Dashboard/home' component={NavHome} />
+
 
   const url = "http://localhost:3001/api/users/login";
 
@@ -30,20 +27,33 @@ function StudentSignIn(){
     password:""
   });
 
-  function submit(e) {
+const  submit = (e)=> {
 
-    e.preventDefault();  
-    axios.post(url,{
+    e.preventDefault(); 
 
+    axios.post(url, {
+
+    
     email : data.email,
     password : data.password
      
     })
     .then(res => {
-      console.log(res.data);
+     // localStorage.setItem('token', res.token);
+      console.log(res);
+      console.log(res.status);
+     
+      if(res.status===200){
+        document.location.href = '/Dashboard/home';
+      }
+      else{
+        window.alert("no")
+      }
+      
     })
     .catch(error => {
       console.log(error);
+      window.alert("Invalid Credentials")
     })
 
     
@@ -76,11 +86,6 @@ function StudentSignIn(){
               value={data.email}
               required
               onChange={(e) => handle(e)}
-
-              // required
-              // onChange={(e) => {
-              //   setEmail(e.target.value);
-              // }}
             />
           </div>
 
@@ -97,10 +102,6 @@ function StudentSignIn(){
               value={data.pass}
               required
               onChange={(e) => handle(e)}
-              // required
-              // onChange={(e) => {
-              //   setPass(e.target.value);
-              // }}
             />
           </div>
 

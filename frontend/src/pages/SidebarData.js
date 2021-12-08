@@ -29,21 +29,22 @@ export const SidebarData = [
     cName: 'nav-text'
   },
   {
-    title: 'Notifications',
-    path: '/Dashboard/notifications',
+    title: 'Rooms',
+    path: '/Dashboard/rooms',
     icon: <AiIcons.AiTwotoneNotification />,
     cName: 'nav-text'
   },
   {
     title: 'Messaage',
-    path: '/Dashboard/messages',
+    path: '/Dashboard/message',
     icon: <FaIcons.FaEnvelopeOpenText />,
     cName: 'nav-text'
   },
   {
-    title: 'Settings',
-    path: '/Dashboard/settings',
-    icon: <IoIcons.IoMdHelpCircle />,
+    title: 'Payment',
+    path: '/Dashboard/payment',
+    icon: <FaIcons.FaEnvelopeOpenText />,
     cName: 'nav-text'
-  }
+  },
+
 ];

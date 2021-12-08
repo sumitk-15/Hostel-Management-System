@@ -1,41 +1,68 @@
-import React, { Component } from "react";
-import { Link } from "react-router-dom";
+import React, { Component, useState } from "react";
+import axios from 'axios';
+import {BrowserRouter as Router, Route, Switch, NavLink } from 'react-router-dom';
+import { useHistory } from "react-router-dom";
+import Recthome from './Rector/RectHome'
 
 
-class SignInForm extends Component {
-  constructor() {
-    super();
 
-    this.state = {
-      email: "",
-      password: ""
-    };
+function StudentSignIn(){
 
-    this.handleChange = this.handleChange.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
+
+  <Route path='/Dash/home' component={Recthome} />
+
+
+  const url = "http://localhost:3001/api/users/reclogin";
+
+  const [data,setData] = useState({ 
+    email:"",
+    password:""
+  });
+
+const  submit = (e)=> {
+
+    e.preventDefault(); 
+
+    axios.post(url,{
+
+    email : data.email,
+    password : data.password
+     
+    })
+    .then(res => {
+      console.log(res);
+      console.log(res.status);
+     
+      if(res.status===200){
+        document.location.href = '/Dash/home'
+      }
+      else{
+        window.alert("no")
+      }
+      
+    })
+    .catch(error => {
+      console.log(error);
+      window.alert("Invalid Credentials")
+    })
+
+    
+
+  }
+ 
+  function handle(e) {
+
+    const newdata={...data};
+    newdata[e.target.id]=e.target.value;
+    setData(newdata);
+    console.log(newdata);
+
   }
 
-  handleChange(event) {
-    let target = event.target;
-    let value = target.type === "checkbox" ? target.checked : target.value;
-    let name = target.name;
 
-    this.setState({
-      [name]: value
-    });
-  }
-
-  handleSubmit(event) {
-    event.preventDefault();
-
-    console.log("The form was submitted with the following data:");
-    console.log(this.state);
-  }
-
-  render() {
     return (
       <div className="formCenter">
-        <form className="formFields" onSubmit={this.handleSubmit}>
+        <form className="formFields" onSubmit={(e) => submit(e)}>
           <div className="formField">
             <label className="formFieldLabel" htmlFor="email">
               E-Mail Address
@@ -46,8 +73,9 @@ class SignInForm extends Component {
               className="formFieldInput"
               placeholder="Enter your email"
               name="email"
-              value={this.state.email}
-              onChange={this.handleChange}
+              value={data.email}
+              required
+              onChange={(e) => handle(e)}
             />
           </div>
 
@@ -61,22 +89,20 @@ class SignInForm extends Component {
               className="formFieldInput"
               placeholder="Enter your password"
               name="password"
-              value={this.state.password}
-              onChange={this.handleChange}
+              value={data.pass}
+              required
+              onChange={(e) => handle(e)}
             />
           </div>
 
           <div className="formField">
-            <button className="formFieldButton">Sign In</button>{" "}
-            <Link to="/" className="formFieldLink">
-              Create an account
-            </Link>
+            <button className="formFieldButton" type="submit">Sign In</button>{" "}
           </div>
 
         </form>
       </div>
     );
   }
-}
 
-export default SignInForm;
+
+export default StudentSignIn;

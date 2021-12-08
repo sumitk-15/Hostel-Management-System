@@ -6,13 +6,36 @@ const cors = require("cors");
 const { Router } = require("express");
 const { header } = require("express-validator");
 const userRouter = require("./api/users/user.router");
+const bodyParser =  require("body-parser");
+const cookieParser = require('cookie-parser');
+const session = require("express-session");
 
-app.use(cors());
+const multer = require('multer');
 
+app.use(cors({
+  origin: ["http://localhost:3000"],
+  methods: ["GET,HEAD,PUT,PATCH,POST,DELETE"],
+  credentials: true
+}));
+
+
+app.use(cookieParser());
 app.use(express.json());
+app.use(bodyParser.urlencoded({extended:true}));
 app.use(express.urlencoded({
   extended: true
 }));
+
+// app.use(session({
+//    secret:process.env.TOKEN_KEY,
+//    resave: false,
+//    saveUninitialized: false,
+//    cookie :  {
+//      maxAge : 60*60*24,
+//    },
+//   })
+// );
+
 
 app.use("/api/users",userRouter);
 
