@@ -129,7 +129,6 @@ module.exports= {
         //console.log(data);
         pool.query(
             'insert into applicationform (fullname,email,prn,phoneno,caddress,paddress,year,branch,lastexam,score,category,bloodgroup,gender,ishandicap,medicalinfo,dob) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
-
             [
                 data.name,
                 data.email,

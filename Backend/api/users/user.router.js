@@ -26,11 +26,6 @@ const {
 const router = require("express").Router();
 const {checkToken} = require("../../auth/token_validation");
 const {body, check} = require('express-validator');
-//const userService = require("./user.service");
-
-
-// const path = require("path");
-// const {upload} =require("./upload");
 
 
 
@@ -74,19 +69,6 @@ router.get("/getapplications", getapplications);
 router.post("/email-send",emailSend);
 
 router.post("/change-password",changePassword);
-
-
-router.get("/random",checkToken,(req,res) => {
-    return res.status(200).send({data:"Success"});
-
-});
-
-
-
-
-
-
-//router.post("/profile/image",upload.single('image'),uploadimg);
 
 
 
