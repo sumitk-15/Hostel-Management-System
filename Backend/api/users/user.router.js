@@ -19,7 +19,8 @@ const {
     femalealllocatedlist,
     isLoggedIn,
     emailSend,
-    changePassword
+    changePassword,
+    mailer
  } = require("./user.controller");
 
 const router = require("express").Router();

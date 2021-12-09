@@ -25,7 +25,8 @@ const {
      getIdByToken,
      sendotp,
      check_otp_email,
-     changepass
+     changepass,
+     checkotp
     }=require("./user.service");
 
 const jwt=require("jsonwebtoken");
@@ -35,7 +36,10 @@ var bcrypt = require('bcryptjs')
 const {validationResult, check} = require('express-validator');
 const cookieParser = require('cookie-parser');
 var nodemailer = require("nodemailer");
+const hbs = require('nodemailer-express-handlebars');
 const { response } = require("express");
+const { Context } = require("express-validator/src/context");
+const path = require('path');
 const app = express();
 
 app.use(cookieParser());
@@ -373,13 +377,17 @@ module.exports = {
             });
         
      },
-     uploadimg : (req,res,err) => {
-
-     },
      logout : async(req,res) => {
-        res.cookie("Hostelcookie", "", { expires: new Date(1), path: "/" });
-        res.clearCookie("Hostelcookie", { path: "/" }).json({message:"Successfully Logged Out"});
-        res.send(req.cookies.Hostelcookie);
+
+        return res
+        .clearCookie("Hostelcookie")
+        .status(200)
+        .send({ message: "Successfully logged out " });
+    
+
+        // res.cookie("Hostelcookie", "", { expires: new Date(1), path: "/" });
+        // res.clearCookie("Hostelcookie", { path: "/" }).json({message:"Successfully Logged Out"});
+        // res.send(req.cookies.Hostelcookie);
      },
      getAuthorizedUser : (req,res) => {
          return res.json({user : {id : req.userId, email : req.userEmail}});
@@ -570,7 +578,7 @@ module.exports = {
             if(!result){
                 res.status(400).send({
                     success:0,
-                    message:"Invalid Email"
+                    message:"Email Not Found"
 
                 });
             }
@@ -581,89 +589,142 @@ module.exports = {
                     console.log(err);
                     res.status(400).send({err:"Error!!!"});
                 }
-                return res.status(200).send({
-                    success:1,
-                    message: "Please check your Email for OTP"
+                //***********Mailer Function*******
+                try{
+                    var transporter = nodemailer.createTransport({
+                        service: 'gmail',
+                        port: 587,
+                        secure: false,
+                        auth: {
+                            user: process.env.HOST_EMAIL,
+                            pass: process.env.HOST_PASSWORD
+                        }
+                   });
+    
+                   transporter.use('compile',hbs({
+                    
+                    viewEngine: {
+                        extName: ".handlebars",
+                        partialsDir: path.resolve(__dirname, "../../views"),
+                        defaultLayout: false,
+                      },
+                      viewPath: path.resolve(__dirname, "../../views"),
+                      extName: ".handlebars",
 
-                });
+                       
+                   }));
+           
+                   var mailOptions = {
+                       from: process.env.HOST_EMAIL,
+                       to: email,
+                       subject: 'Password Reset',
+                       //html: "",
+                      // text: 'OTP for reset password: ' + otpcode,
+                       template: 'email',
+                       context: {
+                           name :result.name,
+                           otp : otpcode,
+                           email : email,
+    
+                       }
+    
+                   };
+           
+                   transporter.sendMail(mailOptions,(err,info) =>{
+                       if(err){
+                           console.log(err);
+                       }
+                       else{
+                           console.log('Email sent: '+info.response);
+                       }
+                   });   
+           
+                     //************end of mailer *******
+                     res.status(200).send({
+                        success: 1,
+                        message: "Please check your Email for OTP"
+    
+                    });
+                     
+    
+                
 
-            });
+                }
+                catch(err){
+                    console.log(err);
+                }
+                
             
-
+            });
 
          });
 
 
-     },
+     },  
      changePassword : async(req,res) => {
-         let data = req.body;
-         check_otp_email((err,result) => {
-             if(err){
-                 console.log(err);
-             }
-             if(data.email === result.email && data.code === result.code)
-             {
-                 let currentTime = new Date().getTime();
-                 let diff = result.expiresIn - currentTime;
-                 if(diff < 0 )
-                 {
-                     res.status(400).send({err: "OTP invalid...Expired"});
-                 }
-                 else {
-                     changepass(data.password,data.email,(err,res) => {
-                         if(err){
-                             console.log(err);
-                         }
-                         return res.status(200).send({
-                             success:1,
-                             message: "Password Changed Successfully"
-                         });
+           let data = req.body;
+           checkotp(data.code,(err,result) => {
+               if(err){
+                   res.status(400).send({err:"OTP Not Found"});
+                   console.log(err);
 
+               }
+                let currentTime = new Date().getTime();
+                //console.log(currentTime);
+                //console.log(result[0].expiretime);
+                let diff = result[0].expiretime - currentTime;
+                //console.log(diff);
+                if(diff <= 0 )
+                {
+                    res.status(400).send({err: "OTP invalid...Expired"});
+                }
+                else{
+                   // console.log(data.newpassword);
+                    if(data.newpassword === data.cnewpassword)
+                    {
+                        let newpass;
+                        let cnewpass;
 
-                     });
-                 }
-             }
-             else{
-                 res.status(400).send({
-                     success:0,
-                     message: "Wrong Email or OTP"
-                 });
-             }
+                        const salt = genSaltSync(10);
+                        newpass = hashSync(data.newpassword,salt);
+                        cnewpass = hashSync(data.cnewpassword,salt);
 
+                        let pass = {
 
-         });
+                          newpass,
+                          cnewpass
+                        }
+                       // console.log(pass);
+                        //console.log(result.email);
+                       changepass(pass,result[0].email,(err,results) => {
+                           if(err){
+                               console.log(err);
+                           }
+                           if(!results){
+                               res.status(400).send({
+                                   success:0,
+                                   message: "Failed to change password"
 
+                               });
+                           }
+                           res.status(200).send({
+                               success:1,
+                               message: "Password Changed Successfully"
+                           });
+  
+  
+                       });
 
-     },
-     mailer = (email,otp) => {
-        var transporter = nodemailer.createTransport({
-             service: 'gmail',
-             port: 587,
-             secure: false,
-             auth: {
-                 user: "hostel@gmail.com",
-                 pass: "1234"
-             }
-        });
+                    }
+                    else{
+                        return res.status(401).send({
+                        message: "Both Password Must Match"
+                    
+                        });
+                    }
+                }
 
-        var mailOptions = {
-            from: 'hostel@gmail.com',
-            to: 'xyzw@gmail.com',
-            subject: 'Sending Mail to receive otp',
-            text: 'Thank you...please change password'
-        };
-
-        transporter.sendMail(mailOptions,(err,info) =>{
-            if(err){
-                console.log(err);
-            }
-            else{
-                console.log('Email sent: '+info.response);
-            }
-        });
-
-     }
-
-     
+           });
+    }
 
 }

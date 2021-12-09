@@ -7,6 +7,9 @@ import {BrowserRouter as Router, Route} from 'react-router-dom';
 import { useHistory } from "react-router-dom";
 import auth from "../auth";
 import NavHome from "./Nav/NavHome";
+//   *********Toaster***********
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 // import Cookies from 'universal-cookie';
  
 // const cookies = new Cookies();
@@ -44,16 +47,37 @@ const  submit = (e)=> {
       console.log(res.status);
      
       if(res.status===200){
+        toast.success("Login Successfully!",{
+          position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        });
         document.location.href = '/Dashboard/home';
       }
       else{
-        window.alert("no")
+        toast.error("Failed to Login-In!");
+        //window.alert("no")
       }
       
     })
     .catch(error => {
       console.log(error);
-      window.alert("Invalid Credentials")
+      //window.alert("Invalid Credentials")
+      toast.error("Invalid Credentials!",{
+        position: "top-right",
+        autoClose: 5000,
+        theme: "dark",
+        icon: "❗",
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
     })
 
     
@@ -73,6 +97,7 @@ const  submit = (e)=> {
     return (
       <div className="formCenter">
         <form className="formFields" onSubmit={(e) => submit(e)}>
+        <ToastContainer />
           <div className="formField">
             <label className="formFieldLabel" htmlFor="email">
               E-Mail Address

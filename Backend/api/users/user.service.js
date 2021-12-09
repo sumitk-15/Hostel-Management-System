@@ -380,10 +380,10 @@ module.exports= {
             }
         );
     },
-    check_otp_email : (callBack) => {
+    check_otp_email : (data,callBack) => {
         pool.query(
-            'select * from otp',
-            [],
+            'select * from otp where email=? and code =?',
+            [data.email,data.code],
             (err,results,fields) => {
                 if(err){
                     callBack(err);
@@ -393,20 +393,38 @@ module.exports= {
         );
     },
     changepass : (data,email,callBack) => {
+        console.log(data.newpass);
         pool.query(
-            'update registration set password=?, cpassword= ? where email=?',
+            'update registration set password=?,cpassword= ? where email=?',
             [
-               data.password,
-               data.cpassword,
+               data.newpass,
+               data.cnewpass,
                email
             ],
             (err,results,fields) => {
                 if(err){
-                    callBack(err);
+                   return callBack(err);
                 }
                 return callBack(null,results);
 
             }
+        );
+    },
+    checkotp : (token,callBack) => {
+        console.log(token);
+        pool.query(
+            'select * from otp where code=?',
+            [token],
+            (err,results,fields) => {
+                if(err){
+                    callBack(err);
+                }
+                var string=JSON.stringify(results);
+                var json =  JSON.parse(string);
+                console.log(json);
+                return callBack(null,json);
+            }
+
         );
     }
 
