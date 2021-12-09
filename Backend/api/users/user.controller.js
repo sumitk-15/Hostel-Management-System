@@ -568,6 +568,7 @@ module.exports = {
 
      },
      emailSend : async(req,res) => {
+         
          const email = req.body.email;
          const response = {}
          getUserByUserEmail(email,(err,result)=> {
