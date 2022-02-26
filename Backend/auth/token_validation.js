@@ -16,7 +16,7 @@ module.exports = {
     checkToken : async(req,res,next) => {
         try{
 
-            let token = req.cookies.Hostelcookie || req.headers['Authorization'];
+            let token = req.cookies.Hostelcookie || req.cookies.Admincookie || req.headers['Authorization'];
 
             //if(token == null) {res.status(401).send("Token Not Found")}
 

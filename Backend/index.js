@@ -26,17 +26,6 @@ app.use(express.urlencoded({
   extended: true
 }));
 
-// app.use(session({
-//    secret:process.env.TOKEN_KEY,
-//    resave: false,
-//    saveUninitialized: false,
-//    cookie :  {
-//      maxAge : 60*60*24,
-//    },
-//   })
-// );
-
-
 app.use("/api/users",userRouter);
 
 

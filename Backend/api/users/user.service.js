@@ -1,8 +1,5 @@
 const pool=require("../../database");
 
-
-
-
 //here all services of users are listed
 module.exports= {
     
@@ -426,8 +423,5 @@ module.exports= {
 
         );
     }
-
-    
-
 
 };
