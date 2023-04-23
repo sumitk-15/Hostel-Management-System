@@ -26,7 +26,17 @@ const {
      sendotp,
      check_otp_email,
      changepass,
-     checkotp
+     checkotp,
+     getByUserEmailID,
+     firstapplication,
+     secondapplication,
+     getStatusfromfirst,
+     userfetch,
+     userprofile,
+     queries,
+     fetchnotiout,
+     fetchnotiuser,
+
     }=require("./user.service");
 
 const jwt=require("jsonwebtoken");
@@ -39,8 +49,24 @@ var nodemailer = require("nodemailer");
 const hbs = require('nodemailer-express-handlebars');
 const { response } = require("express");
 const { Context } = require("express-validator/src/context");
-const path = require('path');
+const path = require("path");
 const app = express();
+
+// File Uploads
+// const Upload = require("../../upload");
+// const path = require("path");
+//AWS CONFIGURATIONS
+
+const { uploadFile } = require("../../s3");
+const {getFileStream} =require("../../s3");
+const fs = require("fs");
+const util = require("util");
+const unlinkFile = util.promisify(fs.unlink);
+
+
+//****File Uploading ******
+const multer = require('multer');
+// const fs = require('fs');
 
 app.use(cookieParser());
 
@@ -219,7 +245,8 @@ module.exports = {
      login : async (req,res) => {
          const body = req.body;
          try {
-            getUserByUserEmail(body.email, async(err,results) => {
+            getUserBy
+            router.post("/userlogin",userLogin);UserEmail(body.email, async(err,results) => {
 
             if(err){
                 console.log(err);
@@ -236,7 +263,7 @@ module.exports = {
                
                     results.password = undefined; //we don't use while sign so make it undefind
                
-                    let jsontoken = jwt.sign({id : results.id},process.env.TOKEN_KEY,{expiresIn: "24h"});
+                    let jsontoken = jwt.sign({id : results.id},process.env.USER_TOKEN_KEY,{expiresIn: "24h"});
 
                     let id= results.id;
 
@@ -376,18 +403,6 @@ module.exports = {
 
             });
         
-     },
-     logout : async(req,res) => {
-
-        return res
-        .clearCookie("Hostelcookie")
-        .status(200)
-        .send({ message: "Successfully logged out " });
-    
-
-        // res.cookie("Hostelcookie", "", { expires: new Date(1), path: "/" });
-        // res.clearCookie("Hostelcookie", { path: "/" }).json({message:"Successfully Logged Out"});
-        // res.send(req.cookies.Hostelcookie);
      },
      getAuthorizedUser : (req,res) => {
          return res.json({user : {id : req.userId, email : req.userEmail}});
@@ -646,10 +661,6 @@ module.exports = {
                         message: "Please check your Email for OTP"
     
                     });
-                     
-    
-                
-
                 }
                 catch(err){
                     console.log(err);
@@ -726,6 +737,561 @@ module.exports = {
                 }
 
            });
-     }
+     },
+     //*********New Controllers*******
+     
+    getUserByEmailId : async(req,res) => {
+         let email = req.body.email;
+         getByUserEmailID(email,(err,results) => {
+            if(err){
+                console.log(err);
+                return res.status(500).json({
+                    success : 0,
+                    message : "Database Connection error"
+                });
+            }
+            return res.status(200).json({
+                success : 1,
+                message:"Email Found",
+                data: results
+            });
+
+         });
+
+    },
+
+    firstapp : async(req,res) => {
+
+       var file =[];
+       var path = [];
+       //const obj = Object.values(JSON.parse(JSON.stringify(rows)));
+       console.log(req.body);
+       console.log(req.files);
+
+       var fileKeys = Object.keys(req.files);
+       for(let i=0;i<fileKeys.length;i++)
+       {
+        //    var fileKey =Object.keys(req.files)[0]; //fieldname
+        //    var file = req.files[fileKey][0].filename; //filename
+           file[i] = req.files[Object.keys(req.files)[i]][0].filename;
+           path[i] = req.files[Object.keys(req.files)[i]][0].path;
+           console.log(file[i]);
+       }
+       
+        let name  = req.body.name;
+        let prn = req.body.prn;
+        let email = req.body.email;
+        let phoneno = req.body.phoneno;
+        let gender=req.body.gender;
+        let category=req.body.category;
+        let course=req.body.course;
+        let branch=req.body.branch;
+        let preexam=req.body.preexam;
+        let prescore=req.body.prescore;
+        //uploading files options variables
+        let addreceipt=file[0];
+        let marksheet =file[1];
+        let castcertificate =file[2];
+
+        var body ={
+            name,
+            prn,
+            email,
+            phoneno,
+            gender,
+            category,
+            course,
+            branch,
+            preexam,
+            prescore,
+            addreceipt,
+            marksheet,
+            castcertificate
+        }
+        var dir = "../../public/uploads/firstappln/";
+        let errors= {}; 
+        try{
+           if(req.fileError)
+           {
+              errors[Object.keys(req.files)[0]] = req.fileError;
+           }
+           if (!fs.existsSync(dir)) {
+            fs.mkdirSync(dir, { recursive: true });
+        }
+           getByUserEmailID(email,(err,result) => {
+               if(err){
+                fs.unlinkSync(path[0]);
+                fs.unlinkSync(path[1]);
+                fs.unlinkSync(path[2]);
+                   return res.status(231).send({
+                       err:"Error!!!"
+                   });
+               }
+               if(result){
+                fs.unlinkSync(path[0]);
+                fs.unlinkSync(path[1]);
+                fs.unlinkSync(path[2]);
+                
+                   return res.status(235).send({
+                      message:"Email Already Exists"
+                   })
+               }
+               else{
+                firstapplication(body,async(err,results) => {
+                   
+                    if(err){
+                        console.log(err);
+                        fs.unlinkSync(path[0]);
+                        fs.unlinkSync(path[1]);
+                        fs.unlinkSync(path[2]);
+                        return res.status(231).json({
+                            success : 0,
+                            message : "Database Error....Email/PRN should be Unique"
+                        });
+                    }
+                    if(!results){
+                        fs.unlinkSync(path[0]);
+                        fs.unlinkSync(path[1]);
+                        fs.unlinkSync(path[2]);
+                        return res.status(231).send({
+                            success:0,
+                            message: "Invalid Data"
+
+                        });
+                    }
+                    for(let i=0;i<fileKeys.length;i++)
+                    {
+                         
+                            const result = await uploadFile(req.files[Object.keys(req.files)[i]][0],req.body.prn);
+                            console.log("S3 File Upload" + JSON.stringify(result) + "\n");
+                        
+                 
+                     }
+
+
+                    return res.status(200).send({
+                        success : 1,
+                        message:"Application 1 Submitted Successfully",
+                        data: results
+                    });
+            });        
+
+         }
+      });       
+    }
+    catch(err){
+        fs.unlinkSync(path[0]);
+        fs.unlinkSync(path[1]);
+        fs.unlinkSync(path[2]);
+            console.log(err);
+        } 
+    },
+
+    secondapp : async(req,res) => {
+
+       var file =[];
+       var path = [];
+       var fileKeys = Object.keys(req.files);
+   
+       for(let i=0;i<fileKeys.length;i++)
+       {
+        //    var fileKey =Object.keys(req.files)[0]; //fieldname
+        //    var file = req.files[fileKey][0].filename; //filename
+           file[i] = req.files[Object.keys(req.files)[i]][0].filename;
+           path[i] = req.files[Object.keys(req.files)[i]][0].path;
+
+
+       }
+     
+
+        //personal information
+        let name  = req.body.name;
+        let guardiannm = req.body.guardiannm;
+        let address = req.body.address;
+        //let city = req.body.city;
+        let district = req.body.district;
+        let state = req.body.state;
+        let age = req.body.age;
+        let dob =req.body.dob;
+        let category=req.body.category;
+        let bloodgp = req.body.bloodgp;
+        let gender=req.body.gender;
+
+        //Academic Details
+        let course=req.body.course;
+        let branch=req.body.branch;
+        let preexam=req.body.preexam;
+        let prescore=req.body.prescore;
+        let year = req.body.year;
+        let addmissionreceipt=file[0];
+        let previousmarksheet =file[1];
+        let castcertificate =file[2];
+
+        //Contact information
+        let email = req.body.email;
+        let prn = req.body.prn;
+        let adhaar = req.body.adhaar;
+        let phoneno = req.body.phoneno;
+        let guardianno = req.body.guardianno;
+
+        //other 
+        let username = req.body.username;
+        let password = req.body.password;
+        let hostelfeereceipt = file[3];
+        let vacinationcert = file[4];
+        let undertaking = file[5];
+
+        const salt = genSaltSync(10);
+        let pass = hashSync(password,salt);
+        
+
+        var body ={
+            name,
+            guardiannm,
+            address,
+            //city,
+            district,
+            state,
+            age,
+            dob,
+            category,
+            bloodgp,
+            gender,
+            course,
+            branch,
+            preexam,
+            prescore,
+            year,
+            addmissionreceipt,
+            previousmarksheet,
+            castcertificate,
+            email,
+            prn,
+            adhaar,
+            phoneno,
+            guardianno,
+            username,
+            pass,
+            hostelfeereceipt,
+            vacinationcert,
+            undertaking,
+        }
+        var dir = "../../public/uploads/secondappln/";
+
+        try{
+            if(req.fileError)
+            {
+               errors[Object.keys(req.files)[0]] = req.fileError;
+               return res.send(260).status({
+                    error:"File Format is not valid(pdf,jpg,jpeg,png allowed)"
+               });
+            }
+            if (!fs.existsSync(dir)) {
+                fs.mkdirSync(dir, { recursive: true });
+            }
+
+            getStatusfromfirst(prn,async(err,result) => {
+                // let op = result;
+                // console.log(op);
+                if(err){
+                    fs.unlinkSync(path[0]);
+                    fs.unlinkSync(path[1]);
+                    fs.unlinkSync(path[2]);
+                    fs.unlinkSync(path[3]);
+                    fs.unlinkSync(path[4]);
+                    fs.unlinkSync(path[5]);
+                    console.log(err);
+                }
+                if(result == 0){ 
+                    fs.unlinkSync(path[0]);
+                    fs.unlinkSync(path[1]);
+                    fs.unlinkSync(path[2]);
+                    fs.unlinkSync(path[3]);
+                    fs.unlinkSync(path[4]);
+                    fs.unlinkSync(path[5]);
+                    
+                       return res.status(245).send({
+                          message:"You are not eligible for next process"
+                       })
+                }
+                else if(result == 1)
+                {
+                    secondapplication(body,async(error,results) => {
+                        if(error){
+                            console.log(error);
+                            fs.unlinkSync(path[0]);
+                            fs.unlinkSync(path[1]);
+                            fs.unlinkSync(path[2]);
+                            fs.unlinkSync(path[3]);
+                            fs.unlinkSync(path[4]);
+                            fs.unlinkSync(path[5]);
+                            return res.status(240).send({
+                                success : 0,
+                                message : "All Fields Should be Unique...please check onces..Entry already exists"
+                            });
+                        }
+                        if(!results){
+                            fs.unlinkSync(path[0]);
+                            fs.unlinkSync(path[1]);
+                            fs.unlinkSync(path[2]);
+                            fs.unlinkSync(path[3]);
+                            fs.unlinkSync(path[4]);
+                            fs.unlinkSync(path[5]);
+                            return res.status(231).send({
+                                success:0,
+                                message: "Invalid Data"
+    
+                            });
+                        }
+                        for(let i=0;i<fileKeys.length;i++)
+                        {
+                         
+                            const result = await uploadFile(req.files[Object.keys(req.files)[i]][0],req.body.prn);
+                            
+                            console.log("S3 File Upload" + JSON.stringify(result) + "\n");
+                            // console.log(JSON.stringify(result));
+                 
+                        }
+
+                        return res.status(200).send({
+                            success : 1,
+                            message:"Application 2 Submitted Successfully",
+                            data: results
+                        });
+    
+    
+    
+                    });
+
+                }
+               
+                
+
+            });
+        }catch(e){
+            fs.unlinkSync(path[0]);
+            fs.unlinkSync(path[1]);
+            fs.unlinkSync(path[2]);
+            fs.unlinkSync(path[3]);
+            fs.unlinkSync(path[4]);
+            fs.unlinkSync(path[5]);
+            console.log(e);
+        }
+
+        
+        
+
+    }, 
+
+    getStatus : async(req,res) => {
+        let prn = req.body.prn;
+        getStatusfromfirst(prn,(err,results) => {
+            if(err){
+                console.log(err);
+                return;
+            }
+            if(!results){
+                return res.status(401).send({
+                    success:0,
+                });
+            }
+            return res.status(200).send({
+                success:1,
+                data:results
+
+            });
+        });
+    },
+
+    userLogin : async (req,res) => {
+        const body = req.body;
+        //console.log(body.email);
+
+        try {
+           getUserByUserEmail(body.email, async(err,results) => {
+           // console.log(results);  
+            // console.log(results.status);
+           if(err){
+               console.log(err);
+               return res.status(231).send({ msg : err});
+           }
+           if(!results){ 
+               return res.status(260).send({     
+                   message: "Invalid email or password"
+               });
+           }
+           if(results.status === 1)
+           {
+            let isMatchPassword = await bcrypt.compare(body.password , results.password); //comparing password by bcrypt
+           // console.log(isMatchPassword);
+            if(isMatchPassword){
+               
+                    results.password = undefined; //we don't use while sign so make it undefind
+               
+                    let jsontoken = jwt.sign({id : results.id},process.env.USER_TOKEN_KEY,{expiresIn: "24h"});
+ 
+                    let id= results.id;
+ 
+                    let usertoken = {
+                      jsontoken,
+                      id
+                   }
+              
+                //storing token into database
+                storeToken(usertoken,(err,results) => {
+                    
+                    if(err){
+                      console.log(err);
+                        return;
+                    }
+                
+                });
+                
+                return res.status(200).cookie("Hostelcookie",jsontoken,{
+ 
+                    expires: new Date(Date.now() + 86400000),     
+                    httpOnly : true
+ 
+                }).send({
+                    success:1,
+                    message:"Login Successfully",
+                    cookieMsg : "Cookies Being Initialized"
+ 
+                });
+ 
+                
+            }
+            else{
+                return res.status(260).send({
+                    success :0,
+                    errors: "Invalid mail or password"
+                });
+            } 
+           }
+           else if(results.status === 0)
+           {
+               return res.status(271).send({
+                   message:"You are not Eligible for Next Process...Contact Rector Office"
+               });
+           }
+          
+
+        });
+        }
+        catch(err){
+            console.log(err);
+        }
+        
+        
+        
+    },
+
+    logout : async(req,res) => {
+
+        return res
+        .clearCookie("Hostelcookie")
+        .status(200)
+        .send({ message: "Successfully logged out " });
+    },
+    fetchuserProfile : (req,res) => {
+        const body= req.decoded;
+        console.log(body);
+        
+        userfetch(body,(err,results) => {
+            console.log(results);
+            if(err){
+                console.log(err);
+                return;
+            }
+            if(!results){
+                return res.json({
+                    success:0,
+                    message:"Record Not Found"
+
+                });
+            }
+            return res.status(201).send({
+                data:results
+            })
+
+        });
+
+    },
+    updateuserProfile :  (req,res) => {
+
+        const body= req.decoded;
+        const user = req.body;
+        console.log(body);
+
+         getUserById(body.id,(err,result) => {
+            if(err){
+                console.log(err);
+            }
+            
+            else{
+                userprofile(user,result.id,(err,results) => {
+                    if(err){
+                        console.log(err);
+                        return res.status(240).json({
+                            success : 0,
+                            message : "Email Already Exists"
+                        });
+                    }
+                    return res.status(200).json({
+                        success : 1,
+                        message:"User Updated Successfully",
+                        data: results
+                    });
+                });
+                
+                }
+
+            });
+        
+    },
+    postComment: (req, res) => {
+        const msg = req.body;
+
+        queries(msg, (err, results) => {
+            if (err) {
+                console.log(err);
+            }
+            return res.status(200).send({
+                message: "message sent...",
+                data: results
+            });
+        });
+    },
+    outside_notifetch : (req,res) => {
+
+        fetchnotiout((err,result) => {
+            if(err){
+                console.log(err);
+            }
+            return res.status(200).send({
+                
+                data:result
+
+            });
+
+        });
+    },
+    user_notifetch : (req,res) => {
+    
+        fetchnotiuser((err,result) => {
+            if(err){
+                console.log(err);
+            }
+            return res.status(200).send({
+                
+                data:result
+
+            });
+
+        });
+
+    },
+    
+
 
 }

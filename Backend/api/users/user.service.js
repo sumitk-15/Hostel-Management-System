@@ -1,4 +1,6 @@
 const pool=require("../../database");
+const date = require('date-and-time');
+
 
 //here all services of users are listed
 module.exports= {
@@ -89,23 +91,7 @@ module.exports= {
           }
         );
     },
-    getUserByUserEmail: (email,callBack) => {
-
-         pool.query(
-             'select * from registration where email=?',
-             [email],
-             (error,results,fields) => {
-                 if(error) {
-                    callBack(error);
-                 }
-                 return callBack(null,results[0]);
-
-             }
-         );
-
-
-
-    },
+    
     getUserByUserPrn : (prn,callBack) => {
 
         pool.query(
@@ -197,28 +183,7 @@ module.exports= {
 
         );
     },
-    storeToken : (data,callBack) => {
-        console.log(data);
-        pool.query(
-            
-            'update registration set token=? where id=?',
-        
-            [
-                data.jsontoken,
-                data.id
-            ],
-            
-            (error,results,fields) => {
-                if(error){
-                    callBack(error);
-                }
-                return callBack(null,results[0]);
-            }
-
-        );
-
-       
-    },
+    
     fetch : (data,callBack) => {
         pool.query(
             'select * from profile where id=?',
@@ -422,6 +387,285 @@ module.exports= {
             }
 
         );
-    }
+    },
+    //*********New Services*******
+    getByUserEmailID: (email,callBack) => {
 
+        pool.query(
+            'select * from firstapp where email=?',
+            [email],
+            (error,results,fields) => {
+                if(error) {
+                   callBack(error);
+                }
+                return callBack(null,results[0]);
+
+            }
+        );
+
+
+
+    },
+    firstapplication: (data,callBack) => {
+        //console.log(data);
+        pool.query(
+            'insert into firstapp(name,prn,email,phoneno,gender,category,course,branch,preexam,prescore,addreceipt,addmarksheet,castcertificate) values(?,?,?,?,?,?,?,?,?,?,?,?,?)',
+            [
+                data.name,
+                data.prn,
+                data.email,
+                data.phoneno,
+                data.gender,
+                data.category,
+                data.course,
+                data.branch,
+                data.preexam,
+                data.prescore,
+                data.addreceipt,
+                data.marksheet,
+                data.castcertificate,
+                
+            ],
+            (error,results,fields) => {
+                if(error){
+                    return callBack(error);
+                 }
+                 var string=JSON.stringify(results);
+                 //var json =  JSON.parse(string);
+                 return callBack(null,string);
+            }
+
+        );
+
+    },
+    getStatusfromfirst : (prn,callBack) => {
+        pool.query(
+            'select * from firstapp where prn =?',
+            [prn],
+            (err,results,fields) => {
+                if(err){
+                    return callBack(err);
+                }
+                var string=JSON.stringify(results);
+                var json =  JSON.parse(string);
+                console.log(json[0].status);
+                return callBack(null,json[0].status);    
+
+                
+                         
+            }             
+        );
+
+    },
+    secondapplication : (data,callBack) => {
+
+        pool.query(
+            'insert into secondapp(name,guardiannm,address,district,state,age,dob,category,bloodgp,gender,course,branch,preexam,prescore,year,addreceipt,premarksheet,castcertificate,email,prn,adhaarno,phoneno,guardianno,username,password,hostelfeereceipt,vacinationcert,undertaking) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
+            [
+                data.name,
+                data.guardiannm,
+                data.address,
+                data.district,
+                data.state,
+                data.age,
+                data.dob,
+                data.category,
+                data.bloodgp,
+                data.gender,
+                data.course,
+                data.branch,
+                data.preexam,
+                data.prescore,
+                data.year,
+                data.addmissionreceipt,
+                data.previousmarksheet,
+                data.castcertificate,
+                data.email,
+                data.prn,
+                data.adhaar,
+                data.phoneno,
+                data.guardianno,
+                data.username,
+                data.pass,
+                data.hostelfeereceipt,
+                data.vacinationcert,
+                data.undertaking
+    
+            ],
+            (error,results,fields) => {
+                if(error){
+                    return callBack(error);
+                 }
+                 var string=JSON.stringify(results);
+                 //var json =  JSON.parse(string);
+                 return callBack(null,string);
+            }
+
+        );
+
+    },
+    getUserByUserEmail: (email,callBack) => {
+        console.log(email);
+        pool.query(
+            'select * from secondapp where email=?',
+            [email],
+            (error,results,fields) => {
+                if(error) {
+                   callBack(error);
+                }
+                return callBack(null,results[0]);
+
+            }
+        );
+
+    },
+    storeToken : (data,callBack) => { 
+    console.log(data);
+    pool.query(
+        
+        'update secondapp set token=? where id=?',
+    
+        [
+            data.jsontoken,
+            data.id
+        ],
+        
+        (error,results,fields) => {
+            if(error){
+                callBack(error);
+            }
+            return callBack(null,results[0]);
+        }
+
+    );
+
+   
+    },
+    userfetch : (data,callBack) => {
+        console.log(data.id);
+        pool.query(
+            'select * from secondapp where id=?',
+            [data.id],
+            (error,results,fields) => {
+                if(error){
+                    console.log("In error");
+                     return callBack(error);
+                }
+                var string=JSON.stringify(results);
+                var json =  JSON.parse(string);
+                //console.log(json);
+                return callBack(null,json[0]);    
+            }
+            
+
+        );
+    },
+    getUserById : (id,callBack) => {
+        
+        pool.query(
+            'select * from secondapp where id =?',
+            [id],
+            (error,results,fields) => {
+                if(error){
+                    return callBack(error);
+                }
+                    return callBack(null,results[0]);
+            }
+        );
+    },
+    userprofile : (data,id,callBack) => {
+        console.log(data.email);
+
+        pool.query(
+            'update secondapp set name=?,email=?,phoneno=?,branch=?,address=?,year=? where id=?',
+
+            [
+                data.name,
+                data.email,
+                data.phoneno,
+                data.branch,
+                data.address,
+                data.year,
+                id
+               
+            ],
+
+            (error,results,fields) => {
+                if(error){
+                    return callBack(error);
+                }
+                return callBack(null,results);
+            }
+
+        );
+
+    }, 
+    queries: (data, callBack) => {
+        console.log(data);
+        const now  =  new Date();
+        const value = date.format(now,'YYYY/MM/DD HH:mm:ss');
+
+        pool.query(
+            'insert into comments (title,email,name,roomno,block,comment,date) values (?,?,?,?,?,?,?)',
+            [
+                data.title,
+                data.email,
+                data.name,
+                data.roomno,
+                data.block,
+                data.comment,
+                value
+            ],
+            (err, results, fields) => {
+                if (err) {
+                    return callBack(err);
+                }
+                return callBack(null, results);
+
+            }
+        );
+    },
+    fetchnotiout : (callBack) => {
+        
+        pool.query(
+            'select * from notifications',
+            [],
+            (error,results,fields) => {
+                if(error){
+                    console.log("In error");
+                     return callBack(error);
+                }
+                var string=JSON.stringify(results);
+                var json =  JSON.parse(string);
+                //console.log(json);
+                return callBack(null,json);    
+            }
+            
+
+        );
+
+    },
+    fetchnotiuser : (callBack) => {
+       
+        pool.query(
+            'select * from notices',
+            [],
+            (error,results,fields) => {
+                if(error){
+                    console.log("In error");
+                     return callBack(error);
+                }
+                var string=JSON.stringify(results);
+                var json =  JSON.parse(string);
+                //console.log(json);
+                return callBack(null,json);    
+            }
+            
+
+        );
+
+    },
+   
+    
+    
 };

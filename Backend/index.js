@@ -6,11 +6,12 @@ const cors = require("cors");
 const { Router } = require("express");
 const { header } = require("express-validator");
 const userRouter = require("./api/users/user.router");
+const adminRouter = require("./api/admin/admin.router");
+const managerRouter = require("./api/manager/manager.router");
 const bodyParser =  require("body-parser");
 const cookieParser = require('cookie-parser');
 const session = require("express-session");
 
-const multer = require('multer');
 
 app.use(cors({
   origin: ["http://localhost:3000"],
@@ -26,7 +27,11 @@ app.use(express.urlencoded({
   extended: true
 }));
 
-app.use("/api/users",userRouter);
+app.use("/api/users",userRouter); //For Students
+
+app.use("/api/admin",adminRouter); //For admin
+
+app.use("/api/manager",managerRouter); //For Managers
 
 
 require("./database");
